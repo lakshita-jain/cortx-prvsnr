@@ -33,7 +33,7 @@ pipeline {
 
     parameters {
         string(name: 'CORTX_SCRIPTS_REPO', defaultValue: 'https://github.com/Seagate/cortx-k8s', description: 'Repository for cortx-k8s scripts (Services Team)', trim: true)
-        string(name: 'CORTX_SCRIPTS_BRANCH', defaultValue: 'integration', description: 'cortx-k8s scripts (Provisioner Team)', trim: true)
+        string(name: 'CORTX_SCRIPTS_BRANCH', defaultValue: 'cortx-test', description: 'cortx-k8s scripts (Provisioner Team)', trim: true)
         text(defaultValue: '''hostname=<hostname>,user=<user>,pass=<password>''', description: 'VM details to be used. First node will be used as Master', name: 'NODE_HOST_LIST')
         booleanParam(name: 'SETUP_K8s_CLUSTER', defaultValue: false, description: 'Selecting this option will setup K8s Cluster before running Deployment.')
     }
@@ -88,6 +88,7 @@ pipeline {
                     pushd ${WORKSPACE}/devops/ci
                         echo $NODE_HOST_LIST | tr ' ' '\n' > hosts
                         cat hosts
+                        export WORKSPACE=${WORKSPACE}
                         export CONTROL_IMAGE=${CONTROL_IMAGE}
                         export DATA_IMAGE=${DATA_IMAGE}
                         export HA_IMAGE=${HA_IMAGE}
@@ -104,7 +105,7 @@ pipeline {
                     for (remote in remotes) {
                         sshCommand remote: remote, command: """
                             cd ${WORK_SPACE}
-                            ./prereq-deploy-cortx-cloud.sh -d /dev/sdb
+                            ./prereq-deploy-cortx-cloud.sh /dev/sdb
                         """
                     }
                 } 
